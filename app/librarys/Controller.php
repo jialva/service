@@ -117,11 +117,7 @@
 			return $array[intval($mes)];
 		}
 
-		public function nedificio($idedificio){
-			$this->item = $this->model('funciones');
-			return $this->item->edificio($idedificio);
-		}
-
+	
 		public function save($data,$tabla){
 			$this->saveModel = $this->model('funciones');
 			$campos ='';
@@ -155,85 +151,7 @@
 			return $this->saveModel->update($campos,$where,$tabla);
 		}
 
-		public function delete($data,$tabla,$opcion){
-			$this->saveModel = $this->model('funciones');
-			$where='';
-			$objeto = (object) $data;
-			foreach ($objeto as $campo => $value){
-				$where =$campo."=".$value;		    
-			}
-			if($opcion==0){
-				return $this->saveModel->desabled($where,$tabla);
-			}else{
-				if($opcion==1){
-					return $this->saveModel->delete($where,$tabla);
-				}else{
-					if($opcion==2){
-						return $this->saveModel->restore($where,$tabla);
-					}
-				}					
-			}
-		}
 
-		public function select($tabla,$campo,$idtabla,$estado,$sql,$select = false){
-			$this->selectModel = $this->model('funciones');
-			$sel = $this->selectModel->select($tabla,$estado,$sql);
-			$com = '<option value="0">--Seleccionar--</option>';
-			if(!empty($sel)){
-				foreach ($sel as $row) {
-					if($select){
-						if($select==$row[$idtabla]){
-							$com .= '<option selected value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-						}else{
-							$com .= '<option value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-						}
-					}else{
-						$com .= '<option value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-					}					
-				}				
-			}
-			return $com;
-		}
-
-		public function select1($tabla,$campo,$idtabla,$estado,$sql,$select = false){
-			$this->selectModel = $this->model('funciones');
-			$sel = $this->selectModel->select1($tabla,$estado,$sql);
-			$com = '<option value="0">--Seleccionar--</option>';
-			if(!empty($sel)){
-				foreach ($sel as $row) {
-					if($select){
-						if($select==$row[$idtabla]){
-							$com .= '<option selected value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-						}else{
-							$com .= '<option value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-						}
-					}else{
-						$com .= '<option value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-					}					
-				}				
-			}
-			return $com;
-		}
-
-		public function selectedificio($tabla,$campo,$idtabla,$estado,$sql,$select = false){
-			$this->selectModel = $this->model('funciones');
-			$sel = $this->selectModel->select($tabla,$estado,$sql);
-			$com = '<option value="0">--Seleccionar Edificio--</option>';
-			if(!empty($sel)){
-				foreach ($sel as $row) {
-					if($select){
-						if($select==$row[$idtabla]){
-							$com .= '<option selected value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-						}else{
-							$com .= '<option value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-						}
-					}else{
-						$com .= '<option value="'.$row[$idtabla].'">'.$row[$campo].'</option>';
-					}					
-				}				
-			}
-			return $com;
-		}
 
 		public function encriptar($texto){
 			$result = '';

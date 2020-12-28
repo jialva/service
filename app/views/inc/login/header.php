@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="alertify/alertify.min.css"/>
     <link rel="stylesheet" href="alertify/default.min.css"/>
 
-    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script src="js/jquery.js"></script>
     <script type="text/javascript" src="<?=BASE_URL?>pagejs/funciones.js"></script>
 
     <?php if(count($js)>=1){

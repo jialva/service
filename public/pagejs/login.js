@@ -1,29 +1,5 @@
 $(function(){
   $("#usuario").focus();
-  $("#usuario").keypress(function(e) {
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var usuario = $("#usuario").val();
-        if(usuario!=''){
-          $("#password").focus();
-        }
-      }
-  });
-  $("#password").keypress(function(e) {
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if(code==13){
-        var usuario = $("#usuario").val();
-        var password = $("#password").val();
-        if(usuario==''){
-          $("#usuario").focus();
-          return;
-        }else{
-          if(password!=''){
-            ingresar();
-          }
-        }
-      }
-  });
 })
 
 function ingresar(){

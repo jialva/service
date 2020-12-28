@@ -33,13 +33,7 @@
 		}
 
 		public function menu($idrol){
-			$this->db->query("SELECT m.idmodulo,mp.modulo as padre,m.modulo,m.modulo_padre,mp.orden,m.orden ordenmenu,m.url,mp.icono,p.ver,p.editar,p.crear,p.eliminar
-											FROM modulo m
-											INNER JOIN permisos p ON m.idmodulo=p.idmodulo
-											INNER JOIN rol r ON r.idrol=p.idrol
-											INNER JOIN modulo mp ON m.modulo_padre=mp.idmodulo
-											where r.idrol=$idrol
-											order by mp.orden,m.orden ASC");
+			$this->db->query("");
 			return $this->db->registers();
 		}
 
