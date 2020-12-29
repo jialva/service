@@ -31,9 +31,9 @@
 <body>
 <header>
     <a href="index-2.html" class="logo">
-        <img src="img/logo.png" alt="Arise Admin Dashboard Logo"></a>
+        <img src="img/logo.jpg" alt="Arise Admin Dashboard Logo"></a>
     <ul id="header-actions" class="clearfix">
-        <li class="list-box hidden-xs dropdown"><a id="drop2" href="#" role="button" class="dropdown-toggle"
+        <!--<li class="list-box hidden-xs dropdown"><a id="drop2" href="#" role="button" class="dropdown-toggle"
                                                    data-toggle="dropdown"><i class="icon-warning2"></i> </a><span
                     class="info-label blue-bg">5</span>
             <ul class="dropdown-menu imp-notify">
@@ -99,7 +99,7 @@
                 </li>
                 <li class="dropdown-footer">See all the tasks</li>
             </ul>
-        </li>
+        </li>-->
         <li class="list-box user-admin dropdown">
             <div class="admin-details">
                 <div class="name"><?=Session::get('usuario')?></div>
@@ -111,7 +111,7 @@
                 <li class="dropdown-content">
                     <!--<a href="profile.html">Edit Profile</a> 
                     <a href="forgot-pwd.html">Change Password</a> <a href="styled-inputs.html">Settings</a>--> 
-                    <a href="login.html">Salir</a>
+                    <a href="#">Salir</a>
                 </li>
             </ul>
         </li>
@@ -131,12 +131,21 @@
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="icon-import_contacts"></i>Facturación<span class="caret"></span></a>
+                        <i class="icon-local_atm"></i>Facturaci&oacute;n<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="<?=BASE_URL?>tipofacturacion">Actualizar Tipo Facturaci&oacute;n</a></li>
+                        <li><a href="<?=BASE_URL?>promedios">Actualizar Promedios</a></li>
+                        <li><a href="<?=BASE_URL?>lecturas">Actualizar Lecturas</a></li>
+                        <li><a href="<?=BASE_URL?>eliminardescuentos">Eliminar descuentos desabastecimientos</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="icon-printer"></i>Impresi&oacute;n<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="<?=BASE_URL?>fechas">Actualizar fechas</a></li>
                         <li><a href="<?=BASE_URL?>rutasecuencia">Actualizar ruta de secuencia</a></li>
                         <li><a href="<?=BASE_URL?>grupoimpresion">Actualizar grupo de impresi&oacute;n</a></li>
-                        <li><a href="<?=BASE_URL?>eliminardescuentos">Eliminar descuentos desabastecimientos</a></li>
                     </ul>
                 </li>
             </ul>

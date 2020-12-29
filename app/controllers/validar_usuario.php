@@ -10,7 +10,7 @@
 
 		public function validar(){
 			$usuario = strtoupper($_POST['usuario']);
-			$password = $_POST['password'];
+			$password = trim($_POST['password']);
 			$datos = $this->validarModel->validardatos(trim($usuario));
 			$pass = strtoupper(trim($this->encriptar($password)));
 			if(!empty($datos)){
