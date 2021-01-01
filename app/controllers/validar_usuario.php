@@ -12,11 +12,12 @@
 			$usuario = strtoupper($_POST['usuario']);
 			$password = trim($_POST['password']);
 			$datos = $this->validarModel->validardatos(trim($usuario));
-			$pass = strtoupper(trim($this->encriptar($password)));
+			$pass = strtoupper(trim($password));
 			if(!empty($datos)){
-				if($pass === strtoupper($datos['contra'])){
+				if($pass === $this->desencriptar($datos['contra'])){
 					Session::set('autenticado',true);
 					Session::set('usuario',$datos['login']);
+					Session::set('nombre',$datos['nombres']);
 					$data['mensaje'] ='Ingresando al sistema';
 					$data['res']=1;
 				}else{

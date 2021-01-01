@@ -103,7 +103,7 @@
         <li class="list-box user-admin dropdown">
             <div class="admin-details">
                 <div class="name"><?=Session::get('usuario')?></div>
-                <div class="designation">System Admin</div>
+                <div class="designation"><?=substr(Session::get('nombre'),0,15)?></div>
             </div>
             <a id="drop4" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i
                         class="icon-account_circle"></i></a>
@@ -111,7 +111,7 @@
                 <li class="dropdown-content">
                     <!--<a href="profile.html">Edit Profile</a> 
                     <a href="forgot-pwd.html">Change Password</a> <a href="styled-inputs.html">Settings</a>--> 
-                    <a href="#">Salir</a>
+                    <a href="<?=BASE_URL?>validar_usuario/salir">Salir</a>
                 </li>
             </ul>
         </li>
@@ -136,6 +136,7 @@
                         <li><a href="<?=BASE_URL?>tipofacturacion">Actualizar Tipo Facturaci&oacute;n</a></li>
                         <li><a href="<?=BASE_URL?>promedios">Actualizar Promedios</a></li>
                         <li><a href="<?=BASE_URL?>lecturas">Actualizar Lecturas</a></li>
+                        <li><a href="<?=BASE_URL?>ciclos">Actualizar Ciclos</a></li>
                         <li><a href="<?=BASE_URL?>eliminardescuentos">Eliminar descuentos desabastecimientos</a></li>
                     </ul>
                 </li>
