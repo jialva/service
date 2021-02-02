@@ -12,6 +12,11 @@
 		    return $this->db->registers();
 		}
 
+		public function ciclos(){
+			$this->db->query("SELECT codsuc,codciclo,descripcion FROM facturacion.detciclosucursal WHERE codciclo in (1,4,6,7,8,9,11,12,13,14,16,17,18,20,21,35) AND descripcion <> '' ORDER BY codciclo ASC");
+			return $this->db->registers();
+		  }
+
 		public function actualizarlecturas($codsuc,$todos,$factual,$fanterior,$lactual,$lanterior,$nconsumo,$eslectura,$predios,$anio,$mes){
 			$and = " AND codsuc = $codsuc";
 			if($todos == 1){
@@ -55,6 +60,40 @@
 		    	//return $e->getMessage();
 				return 0;
 			}
+		}
+
+		public function resumenlecturas($codciclo,$anio,$mes){
+			$mes = 1;
+			$this->db->query("SELECT fechareg,
+								(SELECT count(l.codestlectura) 
+									FROM medicion.lecturas l
+									INNER JOIN estadolectura est ON est.codestlectura=l.codestlectura
+									WHERE est.promediar = 0 AND l.codestlectura<>3  AND l.anio='$anio' AND l.mes='$mes' AND l.codciclo=$codciclo
+								) as leidos,
+								(SELECT count(l.codestlectura) 
+									FROM medicion.lecturas l
+									INNER JOIN estadolectura est ON est.codestlectura=l.codestlectura
+									WHERE est.promediar = 1 AND l.codestlectura<>3  AND l.anio='$anio' AND l.mes='$mes' AND l.codciclo=$codciclo
+								) as promedios,
+								(SELECT count(codestlectura)
+									FROM medicion.lecturas
+									WHERE codestlectura<>3 AND anio='$anio' AND mes='$mes' AND codciclo=$codciclo
+								) as digitados,
+								(SELECT count(codestlectura)
+									FROM medicion.lecturas
+									WHERE anio='$anio' AND mes='$mes' AND codciclo=$codciclo
+								) as total
+								FROM medicion.lecturas 
+								WHERE codciclo=$codciclo AND anio='$anio' AND mes='$mes' LIMIT 1");
+			return $this->db->register();
+		}
+
+		public function lecturas($codciclo,$anio,$mes,$codestado){
+			$this->db->query("SELECT l.*,cl.catetar,cl.lecturapromedio
+							FROM medicion.lecturas l
+							INNER JOIN catastro.cliente cl ON cl.nroinscripcion=l.nroinscripcion AND cl.codsuc=l.codsuc AND cl.codciclo=l.codciclo
+							WHERE l.codciclo=$codciclo AND l.anio='$anio' AND l.mes='$mes' AND l.codestado=$codestado");
+			return $this->db->registers();
 		}
 	}
 ?>

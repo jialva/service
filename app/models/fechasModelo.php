@@ -34,6 +34,10 @@
 				);
 		      	$this->db->execute();
 
+		      	$this->db->query("UPDATE facturacion.periodofacturacion SET fechacorte='$fechacorte' WHERE anio='$anio' AND mes='$mes' AND codciclo=$codciclo"
+				);
+		      	$this->db->execute();
+
 		      	$this->db->commit();
 			return 1;
 		} catch (Exception $e) {

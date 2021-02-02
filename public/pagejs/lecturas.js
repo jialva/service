@@ -59,3 +59,21 @@ function actualizar(){
         }
     });
 }
+
+function criticar(codsuc,codciclo,anio,mes){
+	document.getElementById('bloquea').style.display='block';
+	$.ajax({
+		url: url + 'criticalectura/criticar',
+		type:'post',
+		data:{codsuc:codsuc,codciclo:codciclo,anio:anio,mes:mes},
+		dataType:'json',
+		success:function(result){
+			if(result.ok==1){
+				alertify.success(result.mensaje);
+			}else{
+				alertify.error(result.mensaje);
+			}
+			document.getElementById('bloquea').style.display='none';
+		}
+	})
+}

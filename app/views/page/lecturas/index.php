@@ -17,7 +17,7 @@
                         </div>
                         <div class="col-md-1">
                             <label for="creditCard">Mes</label>
-                            <input class="form-control" id="mes" name="mes" value="<?=date('m')?>">
+                            <input class="form-control" id="mes" name="mes" value="<?=intval(date('m'))?>">
                         </div>
                         <div class="col-md-3">
                             <label for="creditCard">Sucursales</label>
