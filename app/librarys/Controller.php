@@ -184,6 +184,11 @@
 
 		public function fechaIn($date){
 			$arr = explode('/', $date);
+			return $arr[2].'-'.$arr[1].'-'.$arr[0];
+		}
+
+		public function fechaEs($date){
+			$arr = explode('/', $date);
 			$arr = explode('-', $date);
 			return $arr[2].'-'.$arr[1].'-'.$arr[0];
 		}

@@ -63,7 +63,7 @@
 		}
 
 		public function resumenlecturas($codciclo,$anio,$mes){
-			$mes = 1;
+			//$mes = 1;
 			$this->db->query("SELECT fechareg,
 								(SELECT count(l.codestlectura) 
 									FROM medicion.lecturas l
@@ -89,10 +89,10 @@
 		}
 
 		public function lecturas($codciclo,$anio,$mes,$codestado){
-			$this->db->query("SELECT l.*,cl.catetar,cl.lecturapromedio
+			$this->db->query("SELECT l.*,cl.catetar,cl.lecturapromedio,cl.nroinscripcion
 							FROM medicion.lecturas l
-							INNER JOIN catastro.cliente cl ON cl.nroinscripcion=l.nroinscripcion AND cl.codsuc=l.codsuc AND cl.codciclo=l.codciclo
-							WHERE l.codciclo=$codciclo AND l.anio='$anio' AND l.mes='$mes' AND l.codestado=$codestado");
+							INNER JOIN catastro.clientes cl ON cl.nroinscripcion=l.nroinscripcion AND cl.codsuc=l.codsuc AND cl.codciclo=l.codciclo
+							WHERE l.codciclo=$codciclo AND l.anio='$anio' AND l.mes='$mes' AND l.codestlectura=$codestado");
 			return $this->db->registers();
 		}
 

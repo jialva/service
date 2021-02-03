@@ -66,12 +66,9 @@ function criticar(codsuc,codciclo,anio,mes){
 		url: url + 'criticalectura/criticar',
 		type:'post',
 		data:{codsuc:codsuc,codciclo:codciclo,anio:anio,mes:mes},
-		dataType:'json',
 		success:function(result){
-			if(result.ok==1){
-				alertify.success(result.mensaje);
-			}else{
-				alertify.error(result.mensaje);
+			if(result==2){
+				alertify.error('No se detectó incidencias');
 			}
 			document.getElementById('bloquea').style.display='none';
 		}
