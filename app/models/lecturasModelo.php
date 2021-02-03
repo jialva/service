@@ -95,5 +95,10 @@
 							WHERE l.codciclo=$codciclo AND l.anio='$anio' AND l.mes='$mes' AND l.codestado=$codestado");
 			return $this->db->registers();
 		}
+
+		public function tarifario($codsuc){
+			$this->db->query("SELECT catetar,volumenesp FROM facturacion.tarifas WHERE codsuc=$codsuc ORDER BY catetar ASC");
+			return $this->db->registers();
+		}
 	}
 ?>
