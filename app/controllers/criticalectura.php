@@ -70,155 +70,270 @@
             $sheet->setCellValue('A1', 'Items');
             $sheet->setCellValue('B1', 'Nro Inscripcion');
             $sheet->setCellValue('C1', 'Observacion');
+            $sheet->setCellValue('D1', 'Descuento');
             for($i=0;$i<count($codestados);++$i){
-                $items = $this->lecturas->lecturas($codciclo,$anio,$mes,$codestados[$i]);
+                $items = $this->lecturas->lecturas($codciclo,$anio,$mes,$codestados[$i]);                
                 foreach($items as $row){
-                    switch(intval($codestados[$i])){
-                        ////////////////////////LECTURA NORMAL/////////////////////////////////////////////
-                        case 0:
-                            $consumobajo='';$atipico='';
+                    if($codestados[$i]==3 || $codestados[$i]==6){
+                        if($codestados[$i]==3){//NO INGRESA LECTURA U OBSERVACION
+                            $sheet->setCellValue('A'.$fila, ($fila-1));
+                            $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                            $sheet->setCellValue('C'.$fila, 'No se ingreso lectura o observacion');
+                            $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                            $sheet->setCellValue('D'.$fila, $descuento);
+                            $fila++; 
+                        }else{
+                            if($codestados[$i]==6){//MEDIDOR MANIPULADO
+                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                $sheet->setCellValue('C'.$fila, 'Se promediará por estar manipulado');
+                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                $sheet->setCellValue('D'.$fila, $descuento);
+                                $fila++; 
+                            }
+                        }                                                
+                    }else{
+                        if($codestados[$i]==0 || $codestados[$i]==19 || $codestados[$i]==25 || $codestados[$i]==64){//LECTURA NORMAL/////
                             if($row['consumo']>0){
                                 if($row['consumo']>99900){
                                     $sheet->setCellValue('A'.$fila, ($fila-1));
                                     $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
                                     $sheet->setCellValue('C'.$fila, 'El Consumo es '.$row['consumo'].' se recomienda validar, de ser erronea cambiar a obs. 105');
+                                    $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                    $sheet->setCellValue('D'.$fila, $descuento);
                                     $fila++; 
                                 }else{
                                     $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);                                   
                                     if($consumobajo===0){
-                                        $atipico = $this->atipico($row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
+                                        $atipico = $this->atipico($row['codciclo'],$row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
                                         if($atipico!=0){
                                             $sheet->setCellValue('A'.$fila, ($fila-1));
                                             $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
                                             $sheet->setCellValue('C'.$fila, 'Consumo de '.$row['consumo'].', se recomienda cambiar a atipico');
+                                            $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                            $sheet->setCellValue('D'.$fila, $descuento);
                                             $fila++; 
                                         }                                        
                                     }else{
                                         $sheet->setCellValue('A'.$fila, ($fila-1));
                                         $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                        $sheet->setCellValue('C'.$fila, 'Consumo bajo en relacion al promedio');
+                                        $sheet->setCellValue('C'.$fila, 'Consumo bajo ('.$row['consumo'].') en relacion al promedio ('.$row['lecturapromedio'].')');
+                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                        $sheet->setCellValue('D'.$fila, $descuento);
                                         $fila++; 
                                     }
                                 }                                  
                             }else{
                                 if($row['consumo']==0){
-                                    $sheet->setCellValue('A'.$fila, ($fila-1));
-                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                    $sheet->setCellValue('C'.$fila, 'Consumo 0, se recomienda cambiar a obs. 50');
-                                    $fila++; 
+                                    if($codestados[$i]!=64){
+                                        $sheet->setCellValue('A'.$fila, ($fila-1));
+                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                        $sheet->setCellValue('C'.$fila, 'Consumo 0, se recomienda cambiar a obs. 50');
+                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                        $fila++;
+                                    }                                     
                                 }else{
                                     $sheet->setCellValue('A'.$fila, ($fila-1));
                                     $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                    $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105');
+                                    $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105, ignorar obs. '.$codestados[$i]);
+                                    $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                    $sheet->setCellValue('D'.$fila, $descuento);
                                     $fila++; 
                                 }
                                 
-                            }                                                   
-                        break;
-                        ////////////////////////LECTURA NO INRGREADA///////////////////////////////////////
-                        case 3:
-                            $sheet->setCellValue('A'.$fila, $row['nroinscripcion']);
-                            $sheet->setCellValue('B'.$fila, 'No se ingreso lectura');
-                            $fila++; 
-                        break;
-                        ////////////////////////MEDIDOR EN CAJA PROFUNDA//////////////////////////////////
-                        case 5:
-                            if($row['consumo']>0){
-                                if($row['consumo']>99900){
-                                    $sheet->setCellValue('A'.$fila, ($fila-1));
-                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                    $sheet->setCellValue('C'.$fila, 'El Consumo es '.$row['consumo'].' se recomienda validar, de ser erronea cambiar a obs. 105');
-                                    $fila++;
-                                }else{
-                                    $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);
-                                    if($consumobajo==0){
-                                        $atipico = $this->atipico($row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
-                                        if($atipico!=0){
-                                            $sheet->setCellValue('A'.$fila, ($fila-1));
-                                            $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                            $sheet->setCellValue('C'.$fila, 'Consumo de '.$row['consumo'].', se recomienda cambiar a atipico');
-                                            $fila++;
-                                        }else{
-                                            $sheet->setCellValue('A'.$fila, ($fila-1));
-                                            $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                            $sheet->setCellValue('C'.$fila, 'Tiene un consumo de '.$row['consumo'].', se recomiendo cambiar a obs. 0');
-                                            $fila++;
-                                        }                                     
-                                    }else{
-                                        $sheet->setCellValue('A'.$fila, ($fila-1));
-                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                        $sheet->setCellValue('C'.$fila, 'Consumo bajo en relacion al promedio');
-                                        $fila++;
-                                    }
-                                }                                    
-                            }else{
-                                if($row['consumo']==0){
-                                    $sheet->setCellValue('A'.$fila, ($fila-1));
-                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                    $sheet->setCellValue('C'.$fila, 'Consumo 0, se recomienda cambiar a obs. 50');
-                                    $fila++;
-                                }else{
-                                    $sheet->setCellValue('A'.$fila, ($fila-1));
-                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                    $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105');
-                                    $fila++;
-                                }                                    
-                            }                                                       
-                        break;
-                        ////////////////////////MEDIDOR MANIPULADO///////////////////////////////////////
-                        case 6:
-                            $sheet->setCellValue('A'.$fila, $row['nroinscripcion']);
-                            $sheet->setCellValue('B'.$fila, 'Se promediara por estar manipulado');
-                            $fila++; 
-                        break;
-                        ////////////////////////MEDIDOR ENTERRADO///////////////////////////////////////
-                        case 13:
-                            if($row['lecturaultima']!=0){
-                                $sheet->setCellValue('A'.$fila, $row['nroinscripcion']);
+                            }   
+                        }else{
+                            if($codestados[$i]==50 || $codestados[$i]==68 || $codestados[$i]==71 || $codestados[$i]==72 || $codestados[$i]==126){//CONSUMO CERO////
                                 if($row['consumo']>0){
                                     if($row['consumo']>99900){
                                         $sheet->setCellValue('A'.$fila, ($fila-1));
                                         $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                        $sheet->setCellValue('C'.$fila, 'El Consumo es '.$row['consumo'].' se recomienda validar, de ser erronea cambiar a obs. 105, ignorar obs. 13');
-                                        $fila++;
+                                        $sheet->setCellValue('C'.$fila, 'El Consumo es '.$row['consumo'].' se recomienda validar, de ser erronea cambiar a obs. 105');
+                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                        $fila++; 
                                     }else{
-                                        $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);
-                                        if($consumobajo==0){
-                                            $atipico = $this->atipico($row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
+                                        $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);                                  
+                                        if($consumobajo===0){
+                                            $atipico = $this->atipico($row['codciclo'],$row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
                                             if($atipico!=0){
                                                 $sheet->setCellValue('A'.$fila, ($fila-1));
                                                 $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                                $sheet->setCellValue('C'.$fila, 'Consumo de '.$row['consumo'].', se recomienda cambiar a atipico, ignorar obs. 13');
-                                                $fila++;
+                                                $sheet->setCellValue('C'.$fila, 'Consumo de '.$row['consumo'].', se recomienda cambiar a atipico');
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++; 
                                             }else{
                                                 $sheet->setCellValue('A'.$fila, ($fila-1));
                                                 $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                                $sheet->setCellValue('C'.$fila, 'Tiene un consumo de '.$row['consumo'].', se recomiendo cambiar a obs. 0, ignorar obs. 13');
-                                                $fila++;
+                                                $sheet->setCellValue('C'.$fila, 'Tiene un consumo de '.$row['consumo'].' se recomienda cambiar a obs. 0, ignorar obs. '. $codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++; 
                                             }                                     
                                         }else{
                                             $sheet->setCellValue('A'.$fila, ($fila-1));
                                             $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                            $sheet->setCellValue('C'.$fila, 'Consumo bajo en relacion al promedio, ignorar obs. 13');
-                                            $fila++;
+                                            $sheet->setCellValue('C'.$fila, 'Consumo bajo ('.$row['consumo'].') en relacion al promedio ('.$row['lecturapromedio'].')');
+                                            $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                            $sheet->setCellValue('D'.$fila, $descuento);
+                                            $fila++; 
                                         }
-                                    }                                    
+                                    }                                  
                                 }else{
-                                    if($row['consumo']==0){
+                                    if($row['consumo']<0){
                                         $sheet->setCellValue('A'.$fila, ($fila-1));
                                         $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                        $sheet->setCellValue('C'.$fila, 'Consumo 0, se recomienda cambiar a obs. 50, ignorar obs. 13');
-                                        $fila++;
+                                        $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105, ignorar obs. '.$codestados[$i]);
+                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                        $fila++; 
+                                    }                               
+                                }
+                            }else{
+                                if($codestados[$i]==5 || $codestados[$i]==13 || $codestados[$i]==14 || $codestados[$i]==30 || $codestados[$i]==46 || $codestados[$i]==52 || $codestados[$i]==53 || $codestados[$i]==54 || $codestados[$i]==55 || $codestados[$i]==58 || $codestados[$i]==61 || $codestados[$i]==62 || $codestados[$i]==63 || $codestados[$i]==102){//LECTURA IGUAL 0//
+                                    if($row['lecturaultima']!=0){
+                                        if($row['consumo']>0){
+                                            if($row['consumo']>99900){
+                                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                $sheet->setCellValue('C'.$fila, 'El Consumo es '.$row['consumo'].' se recomienda validar, de ser erronea cambiar a obs. 105, ignorar obs. '.$codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++;
+                                            }else{
+                                                $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);
+                                                if($consumobajo===0){
+                                                    $atipico = $this->atipico($row['codciclo'],$row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
+                                                    if($atipico!=0){
+                                                        $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                        $sheet->setCellValue('C'.$fila, 'Consumo de '.$row['consumo'].', se recomienda cambiar a atipico, ignorar obs. '.$codestados[$i]);
+                                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                        $fila++;
+                                                    }else{
+                                                        $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                        $sheet->setCellValue('C'.$fila, 'Tiene un consumo de '.$row['consumo'].', se recomiendo cambiar a obs. 0, ignorar obs. '.$codestados[$i]);
+                                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                        $fila++;
+                                                    }                                     
+                                                }else{
+                                                    $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                    $sheet->setCellValue('C'.$fila, 'Consumo bajo ('.$row['consumo'].') en relacion al promedio ('.$row['lecturapromedio'].'), ignorar obs. '.$codestados[$i]);
+                                                    $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                    $sheet->setCellValue('D'.$fila, $descuento);
+                                                    $fila++;
+                                                }
+                                            }                                    
+                                        }else{
+                                            if($row['consumo']==0){
+                                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                $sheet->setCellValue('C'.$fila, 'Consumo 0, se recomienda cambiar a obs. 50, ignorar obs. '.$codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++;
+                                            }else{
+                                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105, ignorar obs. '.$codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++;
+                                            }                                    
+                                        }                                
+                                    }
+                                }else{
+                                    if($codestados[$i]==44 || $codestados[$i]==120 || $codestados[$i]==70){
+                                        if($row['consumo']>0){
+                                            if($row['consumo']>99900){
+                                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                $sheet->setCellValue('C'.$fila, 'El Consumo es '.$row['consumo'].' se recomienda validar, de ser erronea cambiar a obs. 105, ignorar obs. '.$codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++;
+                                            }else{
+                                                $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);
+                                                if($consumobajo===0){
+                                                    $atipico = $this->atipico($row['codciclo'],$row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
+                                                    if($atipico!=0){
+                                                        if($codestados[$i]==120){
+                                                            $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                            $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                            $sheet->setCellValue('C'.$fila, 'No cumple los críterios');
+                                                            $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                            $sheet->setCellValue('D'.$fila, $descuento);
+                                                            $fila++; 
+                                                        }                     
+                                                    }                                  
+                                                }else{
+                                                    $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                    $sheet->setCellValue('C'.$fila, 'Consumo bajo ('.$row['consumo'].') en relacion al promedio ('.$row['lecturapromedio'].'), ignorar obs. '.$codestados[$i]);
+                                                    $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                    $sheet->setCellValue('D'.$fila, $descuento);
+                                                    $fila++;
+                                                }
+                                            }                                    
+                                        }else{
+                                            if($row['consumo']==0){
+                                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                $sheet->setCellValue('C'.$fila, 'Consumo 0, se recomienda cambiar a obs. 50, ignorar obs. '.$codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++;
+                                            }else{
+                                                $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105, ignorar obs. '.$codestados[$i]);
+                                                $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                $fila++;
+                                            }                                    
+                                        }
                                     }else{
-                                        $sheet->setCellValue('A'.$fila, ($fila-1));
-                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
-                                        $sheet->setCellValue('C'.$fila, 'Consumo negativo se recomienda cambiar a obs. 105, ignorar obs. 13');
-                                        $fila++;
-                                    }                                    
-                                }                                
-                            }                                                   
-                        break;
-                    }                    
+                                        if($codestados[$i]==105){
+                                            if($row['consumo']>=0 && $row['consumo']<99900){
+                                                $consumobajo = $this->consumobajo($row['consumo'],$row['lecturapromedio']);
+                                                if($consumobajo===0){
+                                                    $atipico = $this->atipico($row['codciclo'],$row['catetar'],$row['consumo'],$row['lecturapromedio'],$tarifa[$row['catetar']]);
+                                                    if($atipico!=0){
+                                                        $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                        $sheet->setCellValue('C'.$fila, 'Consumo de '.$row['consumo'].', se recomienda cambiar a atipico, ignorar obs. '.$codestados[$i]);
+                                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                        $fila++;
+                                                    }else{
+                                                        $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                        $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                        $sheet->setCellValue('C'.$fila, 'Tiene un consumo de '.$row['consumo'].', se recomiendo cambiar a obs. 0, ignorar obs. '.$codestados[$i]);
+                                                        $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                        $sheet->setCellValue('D'.$fila, $descuento);
+                                                        $fila++;
+                                                    }                                     
+                                                }else{
+                                                    $sheet->setCellValue('A'.$fila, ($fila-1));
+                                                    $sheet->setCellValue('B'.$fila, $row['nroinscripcion']);
+                                                    $sheet->setCellValue('C'.$fila, 'Consumo bajo ('.$row['consumo'].') en relacion al promedio ('.$row['lecturapromedio'].'), ignorar obs. '.$codestados[$i]);
+                                                    $descuento = $this->descuento($row['nroinscripcion'],$anio,$mes);
+                                                    $sheet->setCellValue('D'.$fila, $descuento);
+                                                    $fila++;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }                   
                 }                
             }
             if($fila>2){
@@ -237,16 +352,27 @@
             }
         }
 
-        public function atipico($catetar,$consumo,$promedio,$asignado){
+        public function atipico($codciclo,$catetar,$consumo,$promedio,$asignado){
             $res = 0;
-            if($catetar==1 || $catetar==2){
-                if($consumo>(2*$promedio)){
-                    if($consumo>=(2*$asignado)){
-                        $res = 'Atipico';
+            if($codciclo!=21){
+                if($catetar==1 || $catetar==2){
+                    if($consumo>(2*$promedio)){
+                        if($consumo>=(2*$asignado)){
+                            $res = 'Atipico';
+                        }
                     }
                 }
             }
             return $res;
+        }
+
+        public function descuento($nroinscripcion,$anio,$mes){
+            $descuento = $this->lecturas->buscardescuento($nroinscripcion,$anio,$mes);
+            if(empty($descuento)){
+                return 'No';
+            }else{
+                return 'Si';
+            }
         }
 	}
 ?>

@@ -100,5 +100,10 @@
 			$this->db->query("SELECT catetar,volumenesp FROM facturacion.tarifas WHERE codsuc=$codsuc ORDER BY catetar ASC");
 			return $this->db->registers();
 		}
+
+		public function buscardescuento($nroinscripcion,$anio,$mes){
+			$this->db->query("SELECT * FROM facturacion.descuento_desabastecimiento WHERE nroinscripcion=$nroinscripcion AND anio=$anio AND mes=$mes AND facturado=0");
+			return $this->db->registers();
+		}
 	}
 ?>
